@@ -1,5 +1,8 @@
 # Create EKS cluster with terraform
-## COnfi
+## Config your aws profile
+```
+aws configure --profile {your-aws-profile-name}
+```
 ## Export your AWS CLI Profile
 ```bash
 export AWS_PROFILE={your-aws-profile-name}
