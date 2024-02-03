@@ -1,0 +1,137 @@
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+image:
+  name: pyaephyohein/tfrunner:1.5.5
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+before_script:
+  - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
+  - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+  - export AWS_DEFAULT_REGION=${AWS_REGION}
+  - rm -rf .terraform
+  - terraform --version
+validate:
+  stage: validate
+  script:
+    - terraform validate
+  when: manual
+1. plan backend:
+  stage: plan
+  script:
+    - cd backend/
+    - terraform init
+    - terraform plan --var-file=../env.json
+  when: manual
+4 .plan update backend:
+  stage: plan
+  script:
+    - cd backend/
+    - aws s3 cp s3://${BUCKET_NAME}/backend.tfstate . --sse AES256
+    - mv backend.tfstate terraform.tfstate
+    - terraform init
+    - terraform plan --var-file=../env.json
+  dependencies:
+    - validate
+  when: manual
+2. plan EKS infra:
+  stage: plan
+  script:
+    - cd eks/
+    - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
+    - terraform init --backend-config=./backend.json
+    - terraform plan --var-file=../env.json
+  dependencies:
+    - validate
+  when: manual
+3. plan Addons Services:
+  stage: plan
+  script:
+    - cd Terraform/addons/
+    - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
+    - terraform init --backend-config=./backend.json
+    - terraform plan --var-file=../env.json
+  dependencies:
+    - validate
+  when: manual 
+1. apply backend:
+  stage: apply
+  script:
+    - cd backend/
+    - terraform init
+    - terraform apply --var-file=../env.json --auto-approve
+    - mv terraform.tfstate backend.tfstate
+    - aws s3 cp backend.tfstate s3://${BUCKET_NAME} --sse AES256
+    - aws s3 cp backend.json s3://${BUCKET_NAME} --sse AES256
+  dependencies:
+    - 1. plan backend
+  when: manual
+4. apply update backend:
+  stage: apply
+  script:
+    - cd backend/
+    - aws s3 cp s3://${BUCKET_NAME}/backend.tfstate . --sse AES256
+    - mv backend.tfstate terraform.tfstate
+    - terraform init
+    - terraform plan --var-file=../env.json
+    - aws s3 rm s3://${BUCKET_NAME}/backend.tfstate 
+    - mv terraform.tfstate backend.tfstate
+    - aws s3 cp backend.tfstate s3://${BUCKET_NAME} --sse AES256
+  dependencies:
+    - validate
+  when: manual  
+2. apply EKS infra:
+  stage: apply
+  script:
+    - cd eks/
+    - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
+    - terraform init --backend-config=./backend.json
+    - terraform apply --var-file=../env.json --auto-approve
+    - terraform output cluster_name
+    # - aws eks update-kubeconfig --region ${AWS_REGION} --name $(terraform output cluster_name | tr -d '"')
+    # - aws s3 cp ~/.kube/config s3://${BUCKET_NAME}/kubeconfig  --sse AES256
+    - kubectl config get-contexts
+    - kubectl config use-context devops/eks-iac:eks-cluster
+    - kubectl get nodes
+  dependencies:
+    - 2. plan EKS infra
+  when: manual
+3. apply Addon Services:
+  stage: apply
+  script:
+    - cd Terraform/addons/
+    - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
+    - terraform init --backend-config=./backend.json
+    - terraform apply --var-file=../env.json --auto-approve
+    - terraform output cluster_name
+  dependencies:
+    - 2. apply EKS infra
+  when: manual
+3. destroy backend:
+  stage: destroy
+  script:
+    - cd backend/
+    - terraform init
+    - aws s3 cp s3://${BUCKET_NAME}/backend.tfstate . --sse AES256
+    - mv backend.tfstate terraform.tfstate
+    - terraform destroy --var-file=../env.json --auto-approve
+  when: manual
+2. destroy eks infra:
+  stage: destroy
+  script:
+    - cd eks/
+    - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
+    - terraform init --backend-config=./backend.json
+    - terraform destroy --var-file=../env.json --auto-approve
+  when: manual
+1. destroy Addon services:
+  stage: destroy
+  script:
+    - cd Terraform/addons/
+    - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
+    - terraform init --backend-config=./backend.json
+    - terraform destroy --var-file=../env.json --auto-approve
+  when: manual
