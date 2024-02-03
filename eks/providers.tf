@@ -12,3 +12,10 @@ provider "kubernetes" {
     args = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
   }
 }
+locals {
+  dynamic_tags = {
+    Environment = var.environment
+    Terraform = "true"
+  }
+  default_tags = merge(local.dynamic_tags, var.addon_tags)
+}

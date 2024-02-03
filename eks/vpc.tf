@@ -1,10 +1,3 @@
-locals {
-  dynamic_tags = {
-    Environment = var.environment
-    Terraform = "true"
-  }
-  default_tags = merge(local.dynamic_tags, var.addon_tags)
-}
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
   version = "5.5.1"
