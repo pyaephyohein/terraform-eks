@@ -14,19 +14,19 @@ before_script:
   - export AWS_DEFAULT_REGION=${AWS_REGION}
   - rm -rf .terraform
   - terraform --version
-validate:
+Validate:
   stage: validate
   script:
     - terraform validate
   when: manual
-1. Plan backend:
+1. Plan Backend:
   stage: plan
   script:
     - cd backend/
     - terraform init
     - terraform plan --var-file=../env.json
   when: manual
-3. Plan update backend:
+3. Plan Update Backend:
   stage: plan
   script:
     - cd backend/
@@ -35,9 +35,9 @@ validate:
     - terraform init
     - terraform plan --var-file=../env.json
   dependencies:
-    - validate
+    - Validate
   when: manual
-2. Plan EKS infra:
+2. Plan EKS Infra:
   stage: plan
   script:
     - cd eks/
@@ -45,9 +45,9 @@ validate:
     - terraform init --backend-config=./backend.json
     - terraform plan --var-file=../env.json
   dependencies:
-    - validate
+    - Validate
   when: manual
-1. Apply backend:
+1. Apply Backend:
   stage: apply
   script:
     - cd backend/
@@ -59,7 +59,7 @@ validate:
   dependencies:
     - 1. Plan backend
   when: manual
-3. Apply update backend:
+3. Apply Update Backend:
   stage: apply
   script:
     - cd backend/
@@ -71,9 +71,9 @@ validate:
     - mv terraform.tfstate backend.tfstate
     - aws s3 cp backend.tfstate s3://${BUCKET_NAME} --sse AES256
   dependencies:
-    - validate
+    - Validate
   when: manual  
-2. Apply EKS infra:
+2. Apply EKS Infra:
   stage: apply
   script:
     - cd eks/
@@ -84,7 +84,7 @@ validate:
   dependencies:
     - 2. Plan EKS infra
   when: manual
-2. Destroy backend:
+2. Destroy Backend:
   stage: destroy
   script:
     - cd backend/
@@ -93,7 +93,7 @@ validate:
     - mv backend.tfstate terraform.tfstate
     - terraform destroy --var-file=../env.json --auto-approve
   when: manual
-1. Destroy EKS infra:
+1. Destroy EKS Infra:
   stage: destroy
   script:
     - cd eks/
