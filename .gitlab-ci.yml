@@ -26,7 +26,7 @@ validate:
     - terraform init
     - terraform plan --var-file=../env.json
   when: manual
-4 .plan update backend:
+4.plan update backend:
   stage: plan
   script:
     - cd backend/
@@ -47,16 +47,6 @@ validate:
   dependencies:
     - validate
   when: manual
-3. plan Addons Services:
-  stage: plan
-  script:
-    - cd Terraform/addons/
-    - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
-    - terraform init --backend-config=./backend.json
-    - terraform plan --var-file=../env.json
-  dependencies:
-    - validate
-  when: manual 
 1. apply backend:
   stage: apply
   script:
@@ -99,17 +89,6 @@ validate:
   dependencies:
     - 2. plan EKS infra
   when: manual
-3. apply Addon Services:
-  stage: apply
-  script:
-    - cd Terraform/addons/
-    - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
-    - terraform init --backend-config=./backend.json
-    - terraform apply --var-file=../env.json --auto-approve
-    - terraform output cluster_name
-  dependencies:
-    - 2. apply EKS infra
-  when: manual
 3. destroy backend:
   stage: destroy
   script:
@@ -123,14 +102,6 @@ validate:
   stage: destroy
   script:
     - cd eks/
-    - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
-    - terraform init --backend-config=./backend.json
-    - terraform destroy --var-file=../env.json --auto-approve
-  when: manual
-1. destroy Addon services:
-  stage: destroy
-  script:
-    - cd Terraform/addons/
     - aws s3 cp s3://${BUCKET_NAME}/backend.json . --sse AES256
     - terraform init --backend-config=./backend.json
     - terraform destroy --var-file=../env.json --auto-approve

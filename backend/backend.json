@@ -1,0 +1,8 @@
+{
+    "region" : "ap-southeast-1",
+    "bucket" : "mgou-eks-testing-state-state",
+    "dynamodb_table" : "mgou-eks-testing-state-lock",
+    "profile" : "",
+    "role_arn" : "",
+    "encrypt" : "true"
+}
