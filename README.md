@@ -1,13 +1,13 @@
 # Create EKS cluster with terraform cli
-## Config your aws profile
+### Config your aws profile
 ```
 aws configure --profile {your-aws-profile-name}
 ```
-## Export your AWS CLI Profile
+### Export your AWS CLI Profile
 ```bash
 export AWS_PROFILE={your-aws-profile-name}
 ```
-## Edit env.json
+### Edit env.json
 ```json
 {
     "name" :"mgou-eks",
@@ -35,13 +35,13 @@ export AWS_PROFILE={your-aws-profile-name}
 }
 ```
 
-## Create Backend Config
+### Create Backend Config
 ```bash
 cd backend
 terraform init
 terraform apply --var-file=../env.json
 ```
-## Create EKS Cluster
+### Create EKS Cluster
 
 ```bash
 cd eks
@@ -51,14 +51,14 @@ terraform apply --var-file=../env.json
 
 # Create EKS cluster with gitlab-ci
 
-## Add CICD ENV on repo setting > CI/CD > Variables
+### Add CICD ENV on repo setting > CI/CD > Variables
 ```bash
 AWS_ACCESS_KEY_ID={your-access-key}
 AWS_SECRET_ACCESS_KEY={your-secret-key}
 AWS_REGION={aws-region}
 BUCKET_NAME={state-backet-name} #Format {name}-{environment}-{state} from env.json
 ```
-## Run on GITLAB-CI Pipeline
+### Run on GITLAB-CI Pipeline
 
 
 ![alt text](gitlab-ci.png)
