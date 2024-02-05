@@ -61,6 +61,10 @@ BUCKET_NAME={state-backet-name} #Format {name}-{environment}-{state} from env.js
 ## Run on GITLAB-CI Pipeline
 
 
+![alt text](gitlab-ci.png)
+
+For the first time Don't need to run 3. Update Backend 
+
 # Create EKS cluster with bashscript
 
 ```bash

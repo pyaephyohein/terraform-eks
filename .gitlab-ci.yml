@@ -93,7 +93,7 @@ validate:
     - mv backend.tfstate terraform.tfstate
     - terraform destroy --var-file=../env.json --auto-approve
   when: manual
-1. Destroy eks infra:
+1. Destroy EKS infra:
   stage: destroy
   script:
     - cd eks/
