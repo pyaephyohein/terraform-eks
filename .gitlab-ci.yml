@@ -57,7 +57,7 @@ Validate:
     - aws s3 cp backend.tfstate s3://${BUCKET_NAME} --sse AES256
     - aws s3 cp backend.json s3://${BUCKET_NAME} --sse AES256
   dependencies:
-    - 1. Plan backend
+    - 1. Plan Backend
   when: manual
 3. Apply Update Backend:
   stage: apply
@@ -82,7 +82,7 @@ Validate:
     - terraform apply --var-file=../env.json --auto-approve
     - terraform output cluster_name
   dependencies:
-    - 2. Plan EKS infra
+    - 2. Plan EKS Infra
   when: manual
 2. Destroy Backend:
   stage: destroy
