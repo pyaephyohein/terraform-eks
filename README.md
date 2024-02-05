@@ -63,10 +63,20 @@ BUCKET_NAME={state-backet-name} #Format {name}-{environment}-{state} from env.js
 
 # Create EKS cluster with bashscript
 
+```bash
+chmod +x ./utility.sh
+./utility.sh --help
+
+./utility.sh --install backend --stage plan
+./utility.sh --install backend --stage apply
+
+./utility.sh --install eks --stage plan
+./utility.sh --install eks --stage apply
+```
 
 
-please note outputs. 
-## Access EKS Cluster 
+# Access EKS Cluster 
+
 ```bash
 aws eks update-kubeconfig --region {your-region} --name {cluster_name}
 
